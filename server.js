@@ -4,7 +4,7 @@ const socketHandle = require('./socket/index')
 const router = express.Router();
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 router.get("/", (req, res) => {
   res.send({ response: "I am alive" }).status(200);
