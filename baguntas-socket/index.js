@@ -7,11 +7,11 @@ const onCreateRoom = (socket) => {
 
 const onJoinRoom = (io, socket) => {
   return socket.on('joinRoom', (roomName) => {
-    let client = io.sockets.adapter.rooms.get(roomName);
+    let client = io.adapter.rooms.get(roomName);
     if (client !== undefined) {
       if (client.size < 2) {
         socket.join(roomName)
-        client = io.sockets.adapter.rooms.get(roomName).size;
+        client = io.adapter.rooms.get(roomName).size;
         socket.broadcast.to(roomName).emit('joinedPlayer', '');
         io.to(roomName).emit('joinRoomStatus', {
           status: 'success',
@@ -52,7 +52,7 @@ const onDisconect = (socket) => {
 
 const onGetRoomPlayers = (io, socket) => {
   return socket.on("getRoomPlayers", (roomId) => {
-    const client = io.sockets.adapter.rooms.get(roomId);
+    const client = io.adapter.rooms.get(roomId);
     if (client !== undefined) {
       io.to(roomId).emit('roomPlayers', {
         roomId: roomId,
@@ -96,7 +96,7 @@ const onRestartGame = (socket) => {
   });
 }
 
-const socketHandle = (io, socket) => {
+const baguntasSocketHandle = (io, socket) => {
   onCreateRoom(socket)
   onJoinRoom(io, socket)
   onGetRoomPlayers(io, socket)
@@ -107,4 +107,4 @@ const socketHandle = (io, socket) => {
   onRestartGame(socket)
 }
 
-module.exports = socketHandle
+module.exports = baguntasSocketHandle

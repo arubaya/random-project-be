@@ -1,6 +1,6 @@
 const express = require('express');
 const http = require('http');
-const socketHandle = require('./socket/index')
+const baguntasSocketHandle = require('./baguntas-socket/index')
 const router = express.Router();
 
 const app = express();
@@ -19,12 +19,17 @@ const io = require('socket.io')(server, {
   }
 });
 
+// List of namespace
+const baguntasNamespaceSocket = io.of('/baguntas');
 
-io.on('connection', (socket) => {
+
+
+// List namespace listener
+baguntasNamespaceSocket.on('connection', (socket) => {
   console.log("New client connected");
   socket.emit('connected', 'Anda sudah terhubung ke server')
 
-  socketHandle(io, socket)
+  baguntasSocketHandle(baguntasNamespaceSocket, socket)
 })
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
