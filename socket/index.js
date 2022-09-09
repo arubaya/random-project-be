@@ -72,6 +72,7 @@ const onStartTheGame = (io, socket) => {
   return socket.on("startTheGame", (roomId) => {
     let interval;
     let countdown = 3;
+    io.to(roomId).emit('started', countdown)
     interval = setInterval(() => {
       if (countdown === 0) {
         clearInterval(interval);
@@ -88,6 +89,13 @@ const onSendChoice = (socket) => {
   });
 }
 
+const onRestartGame = (socket) => {
+  return socket.on("restartGame", (roomId) => {
+    console.log('restart', roomId)
+    socket.broadcast.to(roomId).emit('restartedGame')
+  });
+}
+
 const socketHandle = (io, socket) => {
   onCreateRoom(socket)
   onJoinRoom(io, socket)
@@ -96,6 +104,7 @@ const socketHandle = (io, socket) => {
   onDisconect(socket)
   onStartTheGame(io, socket)
   onSendChoice(socket)
+  onRestartGame(socket)
 }
 
 module.exports = socketHandle
