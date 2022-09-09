@@ -7,24 +7,31 @@ const onCreateRoom = (socket) => {
 
 const onJoinRoom = (io, socket) => {
   return socket.on('joinRoom', (roomName) => {
-    let client = io.sockets.adapter.rooms.get(roomName).size;
-    if (client < 2) {
-      socket.join(roomName)
-      client = io.sockets.adapter.rooms.get(roomName).size;
-      socket.broadcast.to(roomName).emit('joinedPlayer', '');
-      io.to(roomName).emit('joinRoomStatus', {
-        status: 'success',
-        message: 'success to join',
-        roomData: {
-          roomPlayers: client,
-          roomId: roomName
-        }
-      })
-      console.log(roomName, socket.rooms)
+    let client = io.sockets.adapter.rooms.get(roomName);
+    if (client !== undefined) {
+      if (client.size < 2) {
+        socket.join(roomName)
+        client = io.sockets.adapter.rooms.get(roomName).size;
+        socket.broadcast.to(roomName).emit('joinedPlayer', '');
+        io.to(roomName).emit('joinRoomStatus', {
+          status: 'success',
+          message: 'success to join',
+          roomData: {
+            roomPlayers: client.size,
+            roomId: roomName
+          }
+        })
+        console.log(roomName, socket.rooms)
+      } else {
+        socket.to(roomName).emit('joinRoomStatus', {
+          status: 'reject',
+          message: 'Room full',
+        })
+      }
     } else {
       socket.to(roomName).emit('joinRoomStatus', {
         status: 'reject',
-        message: 'Room full',
+        message: 'Room Not Found',
       })
     }
   })
@@ -45,13 +52,19 @@ const onDisconect = (socket) => {
 
 const onGetRoomPlayers = (io, socket) => {
   return socket.on("getRoomPlayers", (roomId) => {
-    const client = io.sockets.adapter.rooms.get(roomId).size;
-    io.to(roomId).emit('roomPlayers', {
-      roomId: roomId,
-      roomPlayers: client
-    });
+    const client = io.sockets.adapter.rooms.get(roomId);
+    if (client !== undefined) {
+      io.to(roomId).emit('roomPlayers', {
+        roomId: roomId,
+        roomPlayers: client.size
+      });
+    } else {
+      io.to(roomId).emit('roomPlayers', {
+        roomId: '-',
+        roomPlayers: '-'
+      });
+    }
     console.log(client);
-    console.log(io.sockets.adapter.rooms.get(roomId));
   });
 }
 
