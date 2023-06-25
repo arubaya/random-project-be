@@ -6,13 +6,14 @@ const router = express.Router();
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-router.get("/", (req, res) => {
+router.get("/api/randpro", (req, res) => {
   res.send({ response: "I am alive" }).status(200);
 });
 app.use(router)
 
 const server = http.createServer(app);
 const io = require('socket.io')(server, {
+  path: '/api/randpro/baguntas/socket.io',
   cors: {
     origin: "*",
     methods: ["GET", "POST"]
@@ -20,7 +21,7 @@ const io = require('socket.io')(server, {
 });
 
 // List of namespace
-const baguntasNamespaceSocket = io.of('/baguntas');
+const baguntasNamespaceSocket = io.of('/api/randpro/baguntas');
 
 
 
